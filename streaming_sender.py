@@ -50,21 +50,21 @@ def parse_args(init):
     else : 
         print("[Sample] Using default resolution")
         
-def main():
+def main(opt):
 
     init = sl.InitParameters()
-    init.camera_resolution = sl.RESOLUTION.AUTO
+    init.camera_resolution = sl.RESOLUTION.HD1080
     init.depth_mode = sl.DEPTH_MODE.NONE
     init.sdk_verbose = 1
     parse_args(init)
-    cam = sl.Camera(0)
+    cam = sl.Camera(opt.cam_id)
     status = cam.open(init)
     if status != sl.ERROR_CODE.SUCCESS: #Ensure the camera has opened succesfully
         print("Camera Open : "+repr(status)+". Exit program.")
         exit()
     runtime = sl.RuntimeParameters()
     stream_params = sl.StreamingParameters()
-    stream_params.port += 0
+    stream_params.port = opt.streaming_port
     print("Streaming on port ",stream_params.port) #Get the port used to stream
     stream_params.codec = sl.STREAMING_CODEC.H264
     stream_params.bitrate = 4000
@@ -91,5 +91,7 @@ def main():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--resolution', type=str, help='Resolution, can be either HD2K, HD1200, HD1080, HD720, SVGA or VGA', default = 'HD1080')
+    parser.add_argument('--cam_id', type=int, default = 0)
+    parser.add_argument('--streaming_port', type=int, default = 3000)
     opt = parser.parse_args()
-    main()
+    main(opt)
